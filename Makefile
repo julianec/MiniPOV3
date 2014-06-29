@@ -1,7 +1,7 @@
 MCU = attiny2313
 F_CPU = 8000000   	# 8 MHz
 #AVRDUDE_PORT = lpt1	# programmer connected to windows parallel
-AVRDUDE_PORT = /dev/cu.KeySerial1	# programmer connected to serial
+AVRDUDE_PORT = /dev/ttyUSB0	# programmer connected to serial
 DELAY=2000
 AVRDUDE_PROGRAMMER = dasa
 
@@ -84,7 +84,7 @@ AVRDUDE = avrdude
 
 AVRDUDE_WRITE_FLASH = -U flash:w:
 
-AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -i $(DELAY)
+AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)  # -i $(DELAY)
 
 # ---------------------------------------------------------------------------
 
