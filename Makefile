@@ -24,6 +24,7 @@ program-makezine: makezine.hex
 program-eyebeam: eyebeam.hex
 program-make: make.hex
 program-digg: digg.hex
+program-dna: dna.hex
 
 # this is necessary if you're burning the AVR for the first time...
 # sets the proper fuse for 8MHz internal oscillator with no clk div
