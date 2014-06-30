@@ -7,24 +7,8 @@ AVRDUDE_PROGRAMMER = dasa
 
 # Default target.
 all: 	begin gccversion \
-	minipov.hex all_leds.hex alt_leds.hex mypov.hex test_leds.hex \
-	largeimage.hex  makefair.hex makezine.hex eyebeam.hex digg.hex make.hex \
+	$(patsubst %.xbm,%.hex,$(wildcard *.xbm))\
 	finished end
-
-# Program the device w/various programs
-program-minipov: minipov.hex
-program-all_leds: all_leds.hex
-program-test_leds: test_leds.hex
-program-alt_leds: alt_leds.hex
-program-mypov: mypov.hex
-program-test_sensor: test_sensor.hex
-program-largeimage: largeimage.hex
-program-makefair: makefair.hex
-program-makezine: makezine.hex
-program-eyebeam: eyebeam.hex
-program-make: make.hex
-program-digg: digg.hex
-program-dna: dna.hex
 
 # this is necessary if you're burning the AVR for the first time...
 # sets the proper fuse for 8MHz internal oscillator with no clk div
@@ -32,7 +16,7 @@ burn-fuse:
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U lfuse:w:0xe4:m
 
 # this programs the dependant hex file using our default avrdude flags
-program-%:
+program-%: %.hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)$<
 
 
@@ -51,7 +35,7 @@ CFLAGS = -g -O$(OPT) \
 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
 -Wall -Wstrict-prototypes \
 -DF_CPU=$(F_CPU) \
--Wa,-adhlns=$(<:.c=.lst) \
+-Wa,-adhlns=$(<:.xbm=.lst) \
 $(patsubst %,-I%,$(EXTRAINCDIRS)) \
 -mmcu=$(MCU)
 
@@ -176,10 +160,10 @@ gccversion :
 
 
 # Compile: create object files from C source files.
-%.o : %.c
+%.o : %.xbm mypov.c
 	@echo
 	@echo $(MSG_COMPILING) $<
-	$(CC) -c $(ALL_CFLAGS) $< -o $@
+	$(CC) -c $(ALL_CFLAGS) mypov.c -o $@ -include $< -Dimage=$(patsubst %.xbm,%,$<)_bits
 
 
 # Compile: create assembler files from C source files.
