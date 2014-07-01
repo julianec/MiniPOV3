@@ -3,7 +3,7 @@
 //#include <avr/signal.h>
 #include <util/delay.h>
 
-void delay_ms( uint16_t milliseconds)
+static void delay_ms( uint16_t milliseconds)
 {
    for( ; milliseconds > 0; milliseconds--)
    {
@@ -34,7 +34,7 @@ static const int imagesize = NUM_ELEM(image);
 
 
 // this function is called when timer1 compare matches OCR1A
-uint8_t j = 0;
+static uint8_t j = 0;
 SIGNAL( TIMER1_COMPA_vect ) {
   if (j >= imagesize) 
     j = 0;
