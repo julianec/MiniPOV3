@@ -36,7 +36,7 @@ CFLAGS = -g -O$(OPT) \
 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
 -Wall -Wstrict-prototypes \
 -DF_CPU=$(F_CPU) \
--Wa,-adhlns=$(<:.xbm=.lst) \
+-Wa,-adhlns=$(<:.c=.lst) \
 $(patsubst %,-I%,$(EXTRAINCDIRS)) \
 -mmcu=$(MCU)
 
@@ -161,16 +161,17 @@ gccversion :
 
 
 # Compile: create object files from mypov.c and .xbm source files.
-# Include the .xbm image files and set image to the variable myfile_bits 
-# which is found in the .xbm file.
-# Patsubst gets the filename myfile.xbm, removes the .xbm suffix and appends
-# _bits to get the name of the variable.
+# Include the generated .xbm.c image files.
 #
-%.o : %.xbm mypov.c
+%.o : %.xbm.c mypov.c
 	@echo
 	@echo $(MSG_COMPILING) $<
-	$(CC) -c $(ALL_CFLAGS) mypov.c -o $@ -include $< -Dimage=$(patsubst %.xbm,%,$<)_bits
+	$(CC) -c $(ALL_CFLAGS) mypov.c -o $@ -include avr/pgmspace.h -include $<
 
+# Create .xbm.c from .xbm to change the data type.
+# This allows to keep the image in the ROM instead of loading it to RAM.
+%.xbm.c: %.xbm
+	sed -e 's/^static unsigned char .*\[\]/const static uint8_t image\[\] PROGMEM/' $< > $@
 
 # Compile: create assembler files from C source files.
 %.s : %.c
@@ -198,6 +199,11 @@ clean_list :
 	$(REMOVE) *.obj
 	$(REMOVE) *.elf
 	$(REMOVE) *.o
+	$(REMOVE) *.xbm.c
+
+# Explicit rule for .xbm files; otherwise, make cleverly assumes that it
+# should be possible to build .xbm files from .xbm.c files.
+%.xbm:;
 
 # Listing of phony targets.
 .PHONY : all begin finish end \
