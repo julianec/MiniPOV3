@@ -29,8 +29,6 @@ void delay_ms( uint16_t milliseconds)
                +((x&0xF0000000LU)?128:0)
 #define B8(d) ((unsigned char)B8__(HEX__(d)))
 
-//const static int image[] = IMAGE_FROM_XBM;
-
 #define NUM_ELEM(x) (sizeof (x) / sizeof (*(x)))
 int imagesize = NUM_ELEM(image);
 
