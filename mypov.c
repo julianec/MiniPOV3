@@ -30,7 +30,7 @@ void delay_ms( uint16_t milliseconds)
 #define B8(d) ((unsigned char)B8__(HEX__(d)))
 
 #define NUM_ELEM(x) (sizeof (x) / sizeof (*(x)))
-int imagesize = NUM_ELEM(image);
+static const int imagesize = NUM_ELEM(image);
 
 
 // this function is called when timer1 compare matches OCR1A
