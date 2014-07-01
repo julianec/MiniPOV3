@@ -161,6 +161,11 @@ gccversion :
 
 
 # Compile: create object files from mypov.c and .xbm source files.
+# Include the .xbm image files and set image to the variable myfile_bits 
+# which is found in the .xbm file.
+# Patsubst gets the filename myfile.xbm, removes the .xbm suffix and appends
+# _bits to get the name of the variable.
+#
 %.o : %.xbm mypov.c
 	@echo
 	@echo $(MSG_COMPILING) $<
