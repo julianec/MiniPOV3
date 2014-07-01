@@ -160,7 +160,7 @@ gccversion :
 	$(CC) $(ALL_CFLAGS) $< --output $@ $(LDFLAGS)
 
 
-# Compile: create object files from C source files.
+# Compile: create object files from mypov.c and .xbm source files.
 %.o : %.xbm mypov.c
 	@echo
 	@echo $(MSG_COMPILING) $<
