@@ -196,4 +196,5 @@ clean_list :
 
 # Listing of phony targets.
 .PHONY : all begin finish end \
-	clean clean_list program
+	clean clean_list program\
+	burn-fuse gccversion
