@@ -6,6 +6,7 @@ DELAY=2000
 AVRDUDE_PROGRAMMER = dasa
 
 # Default target.
+# Build a .hex file for every .xbm file.
 all: 	begin gccversion \
 	$(patsubst %.xbm,%.hex,$(wildcard *.xbm))\
 	finished end
