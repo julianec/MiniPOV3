@@ -2,7 +2,7 @@ MCU = attiny2313
 F_CPU = 8000000   	# 8 MHz
 #AVRDUDE_PORT = lpt1	# programmer connected to windows parallel
 AVRDUDE_PORT = /dev/ttyUSB0	# programmer connected to serial
-DELAY=2000
+DELAY=2000 #Set delay to 0 for "Bus 003 Device 002: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC"
 AVRDUDE_PROGRAMMER = dasa
 
 # Default target.
@@ -70,7 +70,7 @@ AVRDUDE = avrdude
 
 AVRDUDE_WRITE_FLASH = -U flash:w:
 
-AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)  # -i $(DELAY)
+AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)  -i $(DELAY)
 
 # ---------------------------------------------------------------------------
 
