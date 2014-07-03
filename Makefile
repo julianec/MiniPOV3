@@ -1,30 +1,15 @@
 MCU = attiny2313
 F_CPU = 8000000   	# 8 MHz
 #AVRDUDE_PORT = lpt1	# programmer connected to windows parallel
-AVRDUDE_PORT = /dev/cu.KeySerial1	# programmer connected to serial
-DELAY=2000
+AVRDUDE_PORT = /dev/ttyUSB0	# programmer connected to serial
+DELAY=2000 #Set delay to 0 for "Bus 003 Device 002: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC"
 AVRDUDE_PROGRAMMER = dasa
 
 # Default target.
+# Build a .hex file for every .xbm file.
 all: 	begin gccversion \
-	minipov.hex all_leds.hex alt_leds.hex mypov.hex test_leds.hex \
-	largeimage.hex  makefair.hex makezine.hex eyebeam.hex digg.hex make.hex \
+	$(patsubst %.xbm,%.hex,$(wildcard *.xbm))\
 	finished end
-
-# Program the device w/various programs
-program-minipov: minipov.hex
-program-all_leds: all_leds.hex
-program-test_leds: test_leds.hex
-program-alt_leds: alt_leds.hex
-program-mypov: mypov.hex
-program-test_sensor: test_sensor.hex
-program-largeimage: largeimage.hex
-program-makefair: makefair.hex
-program-makezine: makezine.hex
-program-eyebeam: eyebeam.hex
-program-make: make.hex
-program-digg: digg.hex
-program-dna: dna.hex
 
 # this is necessary if you're burning the AVR for the first time...
 # sets the proper fuse for 8MHz internal oscillator with no clk div
@@ -32,7 +17,7 @@ burn-fuse:
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U lfuse:w:0xe4:m
 
 # this programs the dependant hex file using our default avrdude flags
-program-%:
+program-%: %.hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)$<
 
 
@@ -175,12 +160,18 @@ gccversion :
 	$(CC) $(ALL_CFLAGS) $< --output $@ $(LDFLAGS)
 
 
-# Compile: create object files from C source files.
-%.o : %.c
+# Compile: create object files from mypov.c and .xbm source files.
+# Include the generated .xbm.c image files.
+#
+%.o : %.xbm.c mypov.c
 	@echo
 	@echo $(MSG_COMPILING) $<
-	$(CC) -c $(ALL_CFLAGS) $< -o $@
+	$(CC) -c $(ALL_CFLAGS) mypov.c -o $@ -include avr/pgmspace.h -include $<
 
+# Create .xbm.c from .xbm to change the data type.
+# This allows to keep the image in the ROM instead of loading it to RAM.
+%.xbm.c: %.xbm
+	sed -e 's/^static unsigned char .*\[\]/const static uint8_t image\[\] PROGMEM/' $< > $@
 
 # Compile: create assembler files from C source files.
 %.s : %.c
@@ -208,7 +199,13 @@ clean_list :
 	$(REMOVE) *.obj
 	$(REMOVE) *.elf
 	$(REMOVE) *.o
+	$(REMOVE) *.xbm.c
+
+# Explicit rule for .xbm files; otherwise, make cleverly assumes that it
+# should be possible to build .xbm files from .xbm.c files.
+%.xbm:;
 
 # Listing of phony targets.
 .PHONY : all begin finish end \
-	clean clean_list program
+	clean clean_list program\
+	burn-fuse gccversion

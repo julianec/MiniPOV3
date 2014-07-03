@@ -2,8 +2,9 @@
 #include <avr/interrupt.h>
 //#include <avr/signal.h>
 #include <util/delay.h>
+#include "bitops.h"
 
-void delay_ms( uint16_t milliseconds)
+static void delay_ms( uint16_t milliseconds)
 {
    for( ; milliseconds > 0; milliseconds--)
    {
@@ -11,86 +12,11 @@ void delay_ms( uint16_t milliseconds)
    }
 } 
 
-#define TIMER1_PRESCALE_1 1
-#define TIMER1_PRESCALE_8 2
-#define TIMER1_PRESCALE_64 3
-#define TIMER1_PRESCALE_256 4
-#define TIMER1_PRESCALE_1024 5
-
-// We use these macros because binary constants arent always supported. ugh.
-#define HEX__(n) 0x##n##UL
-#define B8__(x) ((x&0x0000000FLU)?1:0)  \
-               +((x&0x000000F0LU)?2:0)  \
-               +((x&0x00000F00LU)?4:0)  \
-               +((x&0x0000F000LU)?8:0)  \
-               +((x&0x000F0000LU)?16:0) \
-               +((x&0x00F00000LU)?32:0) \
-               +((x&0x0F000000LU)?64:0) \
-               +((x&0xF0000000LU)?128:0)
-#define B8(d) ((unsigned char)B8__(HEX__(d)))
-
-const static int image[] = {
-B8(00000000),
-B8(01000100),
-B8(01101100),
-B8(00111100),
-B8(00111110),
-B8(00011111),
-B8(00111110),
-B8(00111100),
-B8(01101100),
-B8(01000100),
-B8(00000000),
-B8(00000000),
-B8(11111111),
-B8(11111111),
-B8(11111111),
-B8(00000111),
-B8(00001110),
-B8(00011100),
-B8(00001110),
-B8(00000111),
-B8(11111111),
-B8(11111111),
-B8(11111111),
-B8(00000000),
-B8(00000000),
-B8(11111111),
-B8(11111111),
-B8(11111111),
-B8(11011011),
-B8(11011011),
-B8(11000011),
-B8(10000001),
-B8(00000000),
-B8(00000000),
-B8(01111110),
-B8(11111111),
-B8(11000011),
-B8(11000011),
-B8(11110011),
-B8(11110111),
-B8(01110110),
-B8(00010000),
-B8(00000000),
-B8(00000000),
-B8(00000000),
-B8(00000000),
-B8(00000000),
-B8(00000000),
-B8(00000000),
-B8(00000000)
-
-
-
-};
-
-#define NUM_ELEM(x) (sizeof (x) / sizeof (*(x)))
-int imagesize = NUM_ELEM(image);
+static const int imagesize = NUM_ELEM(image);
 
 
 // this function is called when timer1 compare matches OCR1A
-uint8_t j = 0;
+static uint8_t j = 0;
 SIGNAL( TIMER1_COMPA_vect ) {
   if (j >= imagesize) 
     j = 0;
